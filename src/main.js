@@ -13,19 +13,21 @@ const compareObjects = (objA, objB) => {
     const plus = '+ ';
 
     for (let i = 0; i < keysLength; i += 1) {
-        if (Object.hasOwn(objA, allKeys[i])) {
-            if (Object.hasOwn(objB, allKeys[i])) {
-                if (objA[allKeys[i]] === objB[allKeys[i]]) {
-                    result.push(`${tabs}${tabs}${allKeys[i]}: ${objA[allKeys[i]]}`);
-                } else {
-                    result.push(`${tabs}${minus}${allKeys[i]}: ${objA[allKeys[i]]}`);
-                    result.push(`${tabs}${plus}${allKeys[i]}: ${objB[allKeys[i]]}`);
-                }
+        const aHasKey = Object.hasOwn(objA, allKeys[i]);
+        const bHasKey = Object.hasOwn(objB, allKeys[i]);
+
+        if (aHasKey && bHasKey) {
+            if (objA[allKeys[i]] === objB[allKeys[i]]) {
+                result.push(`${tabs}${tabs}${allKeys[i]}: ${objA[allKeys[i]]}`);
             } else {
                 result.push(`${tabs}${minus}${allKeys[i]}: ${objA[allKeys[i]]}`);
+                result.push(`${tabs}${plus}${allKeys[i]}: ${objB[allKeys[i]]}`);
             }
+        } else if (aHasKey) {
+            result.push(`${tabs}${minus}${allKeys[i]}: ${objA[allKeys[i]]}`);
         } else {
             result.push(`${tabs}${plus}${allKeys[i]}: ${objB[allKeys[i]]}`);
+
         }
     }
 
