@@ -1,4 +1,5 @@
 import { program } from 'commander';
+import { compareStrings } from './main.js'
 
 program
   .description('Compares two configuration files and shows a difference.')

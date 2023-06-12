@@ -17,7 +17,8 @@
   "author": "morgreek",
   "license": "ISC",
   "dependencies": {
-    "commander": "^10.0.1"
+    "commander": "^10.0.1",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "eslint": "^8.42.0",
