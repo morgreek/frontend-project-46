@@ -29,5 +29,5 @@ test('common case', () => {
   expect(gendif(file1Path, file2Path)).toEqual(fileResult);
 
   // YAML
-  expect(gendif(yFile1Path, yFile2Path)).toEqual(fileResult)
+  expect(gendif(yFile1Path, yFile2Path)).toEqual(fileResult);
 });

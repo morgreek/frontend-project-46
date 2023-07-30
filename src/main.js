@@ -55,7 +55,6 @@ export default (pathA, pathB) => {
   const contentB = readFile(pathB);
   const extB = path.extname(pathB);
 
-
   const objA = parser(contentA, extA);
   const objB = parser(contentB, extB);
 
