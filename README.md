@@ -1,5 +1,5 @@
 ### Aciinema
-[Video example](https://asciinema.org/a/s4AOaAiwjvmu99iTU0Ey1PRHY)
+[Video example](https://asciinema.org/a/gtKKNSSWpXejn2a4aHnaTopY8)
 
 ### Github Actions
 [![Node.js CI](https://github.com/morgreek/frontend-project-46/actions/workflows/node.js.yml/badge.svg?event=push)](https://github.com/morgreek/frontend-project-46/actions/workflows/node.js.yml)

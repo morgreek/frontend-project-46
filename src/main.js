@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import proc from 'process';
 import _ from 'lodash';
+import parser from './parsers.js';
 
 const readFile = (filepath) => {
   const currentDir = proc.cwd();
@@ -49,10 +50,14 @@ const compareObjects = (objA, objB) => {
 
 export default (pathA, pathB) => {
   const contentA = readFile(pathA);
-  const contentB = readFile(pathB);
+  const extA = path.extname(pathA);
 
-  const objA = JSON.parse(contentA);
-  const objB = JSON.parse(contentB);
+  const contentB = readFile(pathB);
+  const extB = path.extname(pathB);
+
+
+  const objA = parser(contentA, extA);
+  const objB = parser(contentB, extB);
 
   return compareObjects(objA, objB);
 };
