@@ -1,4 +1,16 @@
+import fs from 'fs';
+import path from 'path';
+import proc from 'process';
 import _ from 'lodash';
+
+const readFile = (filepath) => {
+  const currentDir = proc.cwd();
+  const fullpath = filepath.startsWith('/') ? filepath : path.resolve(currentDir, filepath);
+
+  const content = fs.readFileSync(fullpath, 'utf-8');
+
+  return content;
+};
 
 const compareObjects = (objA, objB) => {
   const result = ['{'];
@@ -35,9 +47,12 @@ const compareObjects = (objA, objB) => {
   return result.join('\n');
 };
 
-export default (strA, strB) => {
-  const a = JSON.parse(strA);
-  const b = JSON.parse(strB);
+export default (pathA, pathB) => {
+  const contentA = readFile(pathA);
+  const contentB = readFile(pathB);
 
-  return compareObjects(a, b);
+  const objA = JSON.parse(contentA);
+  const objB = JSON.parse(contentB);
+
+  return compareObjects(objA, objB);
 };
