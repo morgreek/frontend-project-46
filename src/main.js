@@ -1,12 +1,8 @@
 import _ from 'lodash';
 
-const mknode = (name, status, ...childs) => {
-  return { name, status, children:childs };
-};
+const mknode = (name, status, ...childs) => ({ name, status, children: childs });
 
-const mkleaf = (name, status, value) => {
-  return { name, status, value };
-};
+const mkleaf = (name, status, value) => ({ name, status, value });
 
 const addChildren = (node, ...childs) => {
   node.children = node.children.concat(childs);
@@ -14,7 +10,7 @@ const addChildren = (node, ...childs) => {
 };
 
 const convertToNode = (name, status, object) => {
-  let result = mknode(name, status);
+  const result = mknode(name, status);
   let child;
   const keys = _.keys(object);
   const keysCount = keys.length;
@@ -32,8 +28,8 @@ const convertToNode = (name, status, object) => {
 
 const convertToChild = (name, status, value) => {
   let child;
-  if (_.isPlainObject(value)){
-    child = convertToNode(name, status, value)
+  if (_.isPlainObject(value)) {
+    child = convertToNode(name, status, value);
   } else if (_.isArray(value)) {
     child = mkleaf(name, status, `[${value}]`);
   } else {
@@ -48,8 +44,8 @@ const diff = (objA, objB, nodeName) => {
     default: 'default',
     add: 'added',
     remove: 'removed',
-    update: 'updated'
-  }
+    update: 'updated',
+  };
 
   const result = mknode(nodeName, statuses.default);
 
@@ -75,7 +71,7 @@ const diff = (objA, objB, nodeName) => {
         // Объект, сравнение по внутренним ключам
         addChildren(result, diff(valueA, valueB, key));
       } else if (isObjectA) {
-        const childA = convertToNode(key, statuses.remove, valueA);;
+        const childA = convertToNode(key, statuses.remove, valueA);
         const childB = mkleaf(key, statuses.add, valueB);
         addChildren(result, childA, childB);
       } else if (_.isArray(valueA)) {
@@ -88,7 +84,7 @@ const diff = (objA, objB, nodeName) => {
           addChildren(result, childA, childB);
         }
       } else if (valueA === valueB) {
-        const child = mkleaf(key,  statuses.default, valueA);
+        const child = mkleaf(key, statuses.default, valueA);
         addChildren(result, child);
       } else {
         const childA = mkleaf(key, statuses.remove, valueA);
@@ -107,6 +103,6 @@ const diff = (objA, objB, nodeName) => {
   }
 
   return result;
-}
+};
 
 export default (objA, objB, name) => diff(objA, objB, name);

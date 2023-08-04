@@ -14,7 +14,6 @@ const readFile = (filepath) => {
   return content;
 };
 
-
 export default (pathA, pathB) => {
   const contentA = readFile(pathA);
   const extA = path.extname(pathA);
