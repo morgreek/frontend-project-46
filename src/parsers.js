@@ -1,13 +1,22 @@
 import yaml from 'js-yaml';
 
-export default (content, filetype) => {
-  const yamlExt = ['.yaml', '.yml'];
-  let result;
-  if (yamlExt.includes(filetype)) {
-    result = yaml.load(content);
-  } else {
-    result = JSON.parse(content);
-  }
+const jsonParser = (content) => JSON.parse(content);
 
-  return result;
-};
+const yamlParser = (content) => yaml.load(content);
+
+export default (content, extension) => {
+    const filetype = extension.startsWith('.') ? extension.slice(1) : extension;
+
+    const jsonExt = ['json']
+    const yamlExt = ['yaml', 'yml'];
+
+    if (jsonExt.includes(filetype)) {
+        return jsonParser(content);
+    }
+
+    if (yamlExt.includes(filetype)) {
+        return yamlParser(content)
+    }
+
+    throw new Error(`Parser not found for this extension: ${extension}`);
+}
