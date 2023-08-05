@@ -10,5 +10,9 @@ export default (diff, type) => {
     return plain(diff);
   }
 
+  if (type === 'json') {
+    return JSON.stringify([diff]);
+  }
+
   throw new Error(`Formatter type not found: ${type}`);
 };
