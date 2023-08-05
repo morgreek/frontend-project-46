@@ -1,101 +1,60 @@
 import _ from 'lodash';
 
-const mknode = (name, status, ...childs) => ({ name, status, children: childs });
+const mknode = (name, status = 'default', children = []) => ({
+  name,
+  status,
+  children,
+  type: 'node',
+});
 
-const mkleaf = (name, status, value) => ({ name, status, value });
+const mkleaf = (name, values = {}, status = 'default') => ({
+  name,
+  status,
+  values,
+  type: 'leaf',
+});
 
-const addChildren = (node, ...childs) => node.children.concat(childs);
-
-const convertToNode = (name, status, object) => {
-  const result = mknode(name, status);
-  let child;
-  const keys = _.keys(object);
-  const keysCount = keys.length;
-  for (let i = 0; i < keysCount; i += 1) {
-    if (object[keys[i]].constructor === Object) {
-      child = convertToNode(keys[i], 'default', object[keys[i]]);
-    } else {
-      child = mkleaf(keys[i], 'default', object[keys[i]]);
-    }
-    result.children = addChildren(result, child);
-  }
-
-  return result;
-};
-
-const convertToChild = (name, status, value) => {
-  let child;
-  if (_.isPlainObject(value)) {
-    child = convertToNode(name, status, value);
-  } else if (_.isArray(value)) {
-    child = mkleaf(name, status, `[${value}]`);
-  } else {
-    child = mkleaf(name, status, value);
-  }
-
-  return child;
-};
-
-const diff = (objA, objB, nodeName) => {
-  const statuses = {
-    default: 'default',
-    add: 'added',
-    remove: 'removed',
-    update: 'updated',
-  };
-
-  const result = mknode(nodeName, statuses.default);
-
+const getDistinctKeys = (objA, objB) => {
   const keysA = _.keys(objA);
   const keysB = _.keys(objB);
-  const allKeys = [...new Set([...keysA, ...keysB])].sort();
-  const keysLength = allKeys.length;
+  return [...new Set([...keysA, ...keysB])].sort();
+};
 
-  for (let i = 0; i < keysLength; i += 1) {
-    // Обход каждого ключа
-    const key = allKeys[i];
-    const hasKeyA = _.has(objA, key);
-    const hasKeyB = _.has(objB, key);
+const diff = (objA, objB, name) => {
+  const result = mknode(name);
 
-    const valueA = hasKeyA ? objA[key] : null;
-    const valueB = hasKeyB ? objB[key] : null;
+  const keys = getDistinctKeys(objA, objB);
+  const count = keys.length;
+  for (let i = 0; i < count; i += 1) {
+    const key = keys[i];
+
+    const valueA = objA[key];
+    const valueB = objB[key];
+
+    const hasA = _.has(objA, key);
+    const hasB = _.has(objB, key);
 
     const isObjectA = _.isPlainObject(valueA);
     const isObjectB = _.isPlainObject(valueB);
 
-    if (hasKeyA && hasKeyB) {
+    let child;
+
+    if (hasA && hasB) {
       if (isObjectA && isObjectB) {
-        // Объект, сравнение по внутренним ключам
-        result.children = addChildren(result, diff(valueA, valueB, key));
-      } else if (isObjectA) {
-        const childA = convertToNode(key, statuses.remove, valueA);
-        const childB = mkleaf(key, statuses.add, valueB);
-        result.children = addChildren(result, childA, childB);
-      } else if (_.isArray(valueA)) {
-        if (_.isEqual(valueA, valueB)) {
-          const child = mkleaf(key, statuses.default, `[${valueA}]`);
-          result.children = addChildren(result, child);
-        } else {
-          const childA = mkleaf(key, statuses.remove, `[${valueA}]`);
-          const childB = convertToChild(key, statuses.add, valueB);
-          result.children = addChildren(result, childA, childB);
-        }
-      } else if (valueA === valueB) {
-        const child = mkleaf(key, statuses.default, valueA);
-        result.children = addChildren(result, child);
+        child = diff(valueA, valueB, key);
+      } else if (_.isEqual(valueA, valueB)) {
+        child = mkleaf(key, { default: valueA });
       } else {
-        const childA = mkleaf(key, statuses.remove, valueA);
-        const childB = mkleaf(key, statuses.add, valueB);
-        result.children = addChildren(result, childA, childB);
+        child = mkleaf(key, { old: valueA, new: valueB }, 'updated');
       }
-    } else if (hasKeyA) {
-      // Ключ только у первого объекта - значение удалено
-      const child = convertToChild(key, statuses.remove, valueA);
-      result.children = addChildren(result, child);
+    } else if (hasA) {
+      child = mkleaf(key, { default: valueA }, 'removed');
     } else {
-      // Ключ только у второго объекта - значение добавлено
-      const child = convertToChild(key, statuses.add, valueB);
-      result.children = addChildren(result, child);
+      child = mkleaf(key, { default: valueB }, 'added');
+    }
+
+    if (child) {
+      result.children.push(child);
     }
   }
 

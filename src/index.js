@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import proc from 'process';
 import parser from './parsers.js';
-import stylish from './stylish.js';
+import formatter from '../formatters/index.js';
 import diff from './main.js';
 
 const readFile = (filepath) => {
@@ -14,7 +14,7 @@ const readFile = (filepath) => {
   return content;
 };
 
-export default (pathA, pathB, formatter) => {
+export default (pathA, pathB, type) => {
   const contentA = readFile(pathA);
   const extA = path.extname(pathA);
 
@@ -26,10 +26,7 @@ export default (pathA, pathB, formatter) => {
 
   const difference = diff(objA, objB);
 
-  let style;
-  if (formatter === 'stylish') {
-    style = stylish(difference, 0);
-  }
+  const style = formatter(difference, type);
 
   return style;
 };

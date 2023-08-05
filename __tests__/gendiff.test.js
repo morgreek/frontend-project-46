@@ -13,6 +13,7 @@ let file2Path;
 let yFile1Path;
 let yFile2Path;
 let fileResult;
+let fileResultPlain;
 
 beforeEach(() => {
   file1Path = getFixturePath('file1.json');
@@ -22,12 +23,15 @@ beforeEach(() => {
   yFile2Path = getFixturePath('file2.yaml');
 
   fileResult = fs.readFileSync(getFixturePath('fileResult.txt'), 'utf-8');
+  fileResultPlain = fs.readFileSync(getFixturePath('fileResultPlain.txt'), 'utf-8');
 });
 
 test('common case', () => {
   // JSON
   expect(gendif(file1Path, file2Path, 'stylish')).toEqual(fileResult);
+  expect(gendif(file1Path, file2Path, 'plain')).toEqual(fileResultPlain);
 
   // YAML
   expect(gendif(yFile1Path, yFile2Path, 'stylish')).toEqual(fileResult);
+  expect(gendif(yFile1Path, yFile2Path, 'plain')).toEqual(fileResultPlain);
 });
