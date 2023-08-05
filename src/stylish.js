@@ -21,6 +21,7 @@ const formatter = (diff, level) => {
       spec = def;
       break;
   }
+
   if (Object.hasOwn(diff, 'children')) {
     if (diff.name) {
       result.push(`${indent.repeat(level * repeat).slice(0, -spec.length)}${spec}${diff.name}: {`);
@@ -36,6 +37,7 @@ const formatter = (diff, level) => {
   } else {
     result.push(`${indent.repeat(level * repeat).slice(0, -spec.length)}${spec}${diff.name}: ${diff.value}`);
   }
+
   return result.join('\n');
 };
 

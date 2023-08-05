@@ -8,9 +8,9 @@ program
   .version('1.0.0')
   .argument('<pathA>')
   .argument('<pathB>')
-  .option('-f, --format <type>', 'output format')
+  .option('-f, --format <type>', 'output format', 'stylish')
   .action((pathA, pathB) => {
-    const result = compareStrings(pathA, pathB);
+    const result = compareStrings(pathA, pathB, program.opts().format);
     console.log(result);
     return result;
   });

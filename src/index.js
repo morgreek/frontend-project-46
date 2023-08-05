@@ -14,7 +14,7 @@ const readFile = (filepath) => {
   return content;
 };
 
-export default (pathA, pathB) => {
+export default (pathA, pathB, formatter) => {
   const contentA = readFile(pathA);
   const extA = path.extname(pathA);
 
@@ -25,7 +25,11 @@ export default (pathA, pathB) => {
   const objB = parser(contentB, extB);
 
   const difference = diff(objA, objB);
-  const style = stylish(difference, 0);
+
+  let style;
+  if (formatter === 'stylish') {
+    style = stylish(difference, 0);
+  }
 
   return style;
 };

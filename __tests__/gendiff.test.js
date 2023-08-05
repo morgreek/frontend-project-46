@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import * as path from 'path';
-import gendif from '../src/main.js';
+import gendif from '../src/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,8 +26,8 @@ beforeEach(() => {
 
 test('common case', () => {
   // JSON
-  expect(gendif(file1Path, file2Path)).toEqual(fileResult);
+  expect(gendif(file1Path, file2Path, 'stylish')).toEqual(fileResult);
 
   // YAML
-  expect(gendif(yFile1Path, yFile2Path)).toEqual(fileResult);
+  expect(gendif(yFile1Path, yFile2Path, 'stylish')).toEqual(fileResult);
 });
