@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import proc from 'process';
 import parser from './parsers.js';
-import formatter from '../formatters/index.js';
+import formatter from './formatters/index.js';
 import diff from './main.js';
 
 const readFile = (filepath) => {
@@ -16,10 +16,10 @@ const readFile = (filepath) => {
 
 export default (pathA, pathB, type) => {
   const contentA = readFile(pathA);
-  const extA = path.extname(pathA);
+  const extA = path.extname(pathA).slice(1);
 
   const contentB = readFile(pathB);
-  const extB = path.extname(pathB);
+  const extB = path.extname(pathB).slice(1);
 
   const objA = parser(contentA, extA);
   const objB = parser(contentB, extB);

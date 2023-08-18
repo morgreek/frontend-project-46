@@ -4,19 +4,17 @@ const jsonParser = (content) => JSON.parse(content);
 
 const yamlParser = (content) => yaml.load(content);
 
-export default (content, extension) => {
-  const filetype = extension.startsWith('.') ? extension.slice(1) : extension;
-
+export default (content, format) => {
   const jsonExt = ['json'];
   const yamlExt = ['yaml', 'yml'];
 
-  if (jsonExt.includes(filetype)) {
+  if (jsonExt.includes(format)) {
     return jsonParser(content);
   }
 
-  if (yamlExt.includes(filetype)) {
+  if (yamlExt.includes(format)) {
     return yamlParser(content);
   }
 
-  throw new Error(`Parser not found for this extension: ${extension}`);
+  throw new Error(`Parser not found for this format: ${format}`);
 };

@@ -1,12 +1,14 @@
 import _ from 'lodash';
 
+const repeater = 4;
+
 const indentator = (char, repeat, level = 0) => char.repeat(level * repeat);
 
-const objectToString = (object, level, name) => {
-  const indent = indentator(' ', 4, level);
+const stringify = (object, level, name) => {
+  const indent = indentator(' ', repeater, level);
   let result;
   if (name) {
-    result = [`${indent.slice(0, -4)}${name}: {`];
+    result = [`${indent.slice(0, repeater * (-1))}${name}: {`];
   } else {
     result = ['{'];
   }
@@ -14,28 +16,30 @@ const objectToString = (object, level, name) => {
   const keys = _.keys(object);
   const count = keys.length;
   for (let i = 0; i < count; i += 1) {
-    if (_.isPlainObject(object[keys[i]])) {
-      result.push(objectToString(object[keys[i]], level + 1, keys[i]));
+    const key = keys[i];
+    const value = object[key];
+    if (_.isPlainObject(value)) {
+      result.push(stringify(value, level + 1, key));
     } else {
-      result.push(`${indent}${keys[i]}: ${object[keys[i]]}`);
+      result.push(`${indent}${key}: ${value}`);
     }
   }
-  result.push(`${indent.slice(0, -4)}}`);
+  result.push(`${indent.slice(0, repeater * (-1))}}`);
   return result.join('\n');
 };
 
 const convertValue = (value, level) => {
   if (_.isPlainObject(value)) {
-    return objectToString(value, level);
+    return stringify(value, level);
   }
   return value;
 };
 
-const formatter = (diff, level) => {
+const formatter = (diff, level = 0) => {
   const added = '+ ';
   const removed = '- ';
-  const def = '  ';
-  const indent = indentator(' ', 4, level);
+  const noChanges = '  ';
+  const indent = indentator(' ', repeater, level);
 
   const result = [];
 
@@ -50,11 +54,11 @@ const formatter = (diff, level) => {
       break;
 
     default:
-      spec = def;
+      spec = noChanges;
       break;
   }
 
-  if (diff.type === 'node') {
+  if (diff.status === 'tree') {
     if (diff.name) {
       result.push(`${indent.slice(0, -spec.length)}${spec}${diff.name}: {`);
     } else {

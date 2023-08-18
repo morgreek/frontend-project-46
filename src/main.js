@@ -1,17 +1,10 @@
 import _ from 'lodash';
 
-const mknode = (name, status = 'default', children = []) => ({
-  name,
-  status,
-  children,
-  type: 'node',
-});
-
-const mkleaf = (name, values = {}, status = 'default') => ({
+const mknode = (name, values = {}, status = 'tree') => ({
   name,
   status,
   values,
-  type: 'leaf',
+  children: [],
 });
 
 const getDistinctKeys = (objA, objB) => {
@@ -21,7 +14,7 @@ const getDistinctKeys = (objA, objB) => {
 };
 
 const diff = (objA, objB, name) => {
-  const result = mknode(name);
+  const result = mknode(name, 'tree');
 
   const keys = getDistinctKeys(objA, objB);
   const count = keys.length;
@@ -43,14 +36,14 @@ const diff = (objA, objB, name) => {
       if (isObjectA && isObjectB) {
         child = diff(valueA, valueB, key);
       } else if (_.isEqual(valueA, valueB)) {
-        child = mkleaf(key, { default: valueA });
+        child = mknode(key, { default: valueA }, 'default');
       } else {
-        child = mkleaf(key, { old: valueA, new: valueB }, 'updated');
+        child = mknode(key, { old: valueA, new: valueB }, 'updated');
       }
     } else if (hasA) {
-      child = mkleaf(key, { default: valueA }, 'removed');
+      child = mknode(key, { default: valueA }, 'removed');
     } else {
-      child = mkleaf(key, { default: valueB }, 'added');
+      child = mknode(key, { default: valueB }, 'added');
     }
 
     if (child) {
