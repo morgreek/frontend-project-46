@@ -7,7 +7,7 @@ import diff from './main.js';
 
 const readFile = (filepath) => {
   const currentDir = proc.cwd();
-  const fullpath = filepath.startsWith('/') ? path.join(currentDir, filepath) : path.resolve(currentDir, filepath);
+  const fullpath = filepath.startsWith('/') ? filepath : path.resolve(currentDir, filepath);
 
   const content = fs.readFileSync(fullpath, 'utf-8');
 
