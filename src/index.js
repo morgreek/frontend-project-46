@@ -14,7 +14,7 @@ const readFile = (filepath) => {
   return content;
 };
 
-export default (pathA, pathB, type) => {
+export default (pathA, pathB, type = 'stylish') => {
   const contentA = readFile(pathA);
   const extA = path.extname(pathA).slice(1);
 
