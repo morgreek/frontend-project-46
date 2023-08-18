@@ -11,5 +11,5 @@ export default (diff, type) => {
     return formattesLib.get(type)(diff);
   }
 
-  throw new Error(`Formatter type not found: ${type}`);
+  // throw new Error(`Formatter type not found: ${type}`);
 };
