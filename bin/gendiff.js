@@ -15,4 +15,4 @@ program
     return result;
   });
 
-program.parse();
+program.parse(process.argv);
