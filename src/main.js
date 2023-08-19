@@ -1,10 +1,10 @@
 import _ from 'lodash';
 
-const mknode = (name, values = {}, status = 'tree') => ({
+const mknode = (name, status = 'tree', values = {}, children = []) => ({
   name,
   status,
   values,
-  children: [],
+  children,
 });
 
 const getDistinctKeys = (objA, objB) => {
@@ -14,10 +14,8 @@ const getDistinctKeys = (objA, objB) => {
 };
 
 const diff = (objA, objB, name) => {
-  const result = mknode(name, 'tree');
-
   const keys = getDistinctKeys(objA, objB);
-  result.children = keys
+  const children = keys
     .reduce((acc, key) => {
       const valueA = objA[key];
       const valueB = objB[key];
@@ -33,17 +31,17 @@ const diff = (objA, objB, name) => {
           return [...acc, diff(valueA, valueB, key)];
         }
         if (_.isEqual(valueA, valueB)) {
-          return [...acc, mknode(key, { default: valueA }, 'default')];
+          return [...acc, mknode(key, 'default', { default: valueA })];
         }
-        return [...acc, mknode(key, { old: valueA, new: valueB }, 'updated')];
+        return [...acc, mknode(key, 'updated', { old: valueA, new: valueB })];
       }
       if (hasA) {
-        return [...acc, mknode(key, { default: valueA }, 'removed')];
+        return [...acc, mknode(key, 'removed', { default: valueA })];
       }
-      return [...acc, mknode(key, { default: valueB }, 'added')];
+      return [...acc, mknode(key, 'added', { default: valueB })];
     }, []);
 
-  return result;
+  return mknode(name, 'tree', {}, children);
 };
 
 export default (objA, objB, name) => diff(objA, objB, name);
