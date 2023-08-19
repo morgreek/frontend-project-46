@@ -6,26 +6,19 @@ const indentator = (char, repeat, level = 0) => char.repeat(level * repeat);
 
 const stringify = (object, level, name) => {
   const indent = indentator(' ', repeater, level);
-  let result;
-  if (name) {
-    result = [`${indent.slice(0, repeater * (-1))}${name}: {`];
-  } else {
-    result = ['{'];
-  }
+  const startLine = name ? `${indent.slice(0, repeater * (-1))}${name}: {\n` : '{\n';
 
-  const keys = _.keys(object);
-  const count = keys.length;
-  for (let i = 0; i < count; i += 1) {
-    const key = keys[i];
-    const value = object[key];
-    if (_.isPlainObject(value)) {
-      result.push(stringify(value, level + 1, key));
-    } else {
-      result.push(`${indent}${key}: ${value}`);
-    }
-  }
-  result.push(`${indent.slice(0, repeater * (-1))}}`);
-  return result.join('\n');
+  const keys = _.keys(object)
+    .map((key) => ({ name: key, value: object[key] }))
+    .reduce((acc, entry) => {
+      if (_.isPlainObject(entry.value)) {
+        return `${acc}${stringify(entry.value, level + 1, entry.name)}\n`;
+      }
+      return `${acc}${indent}${entry.name}: ${entry.value}\n`;
+    }, '');
+
+  const result = `${startLine}${keys}${indent.slice(0, repeater * (-1))}}`;
+  return result;
 };
 
 const convertValue = (value, level) => {
@@ -35,53 +28,44 @@ const convertValue = (value, level) => {
   return value;
 };
 
-const formatter = (diff, level = 0) => {
+const getSpecSymbols = (status) => {
   const added = '+ ';
   const removed = '- ';
   const noChanges = '  ';
-  const indent = indentator(' ', repeater, level);
 
-  const result = [];
-
-  let spec;
-  switch (diff.status) {
+  switch (status) {
     case 'added':
-      spec = added;
-      break;
+      return added;
 
     case 'removed':
-      spec = removed;
-      break;
+      return removed;
 
     default:
-      spec = noChanges;
-      break;
+      return noChanges;
   }
+};
 
+const makeLine = (indent, status, name) => {
+  const spec = getSpecSymbols(status);
+  return `${indent.slice(0, -spec.length)}${spec}${name}`;
+};
+
+const formatter = (diff, level = 0) => {
+  const indent = indentator(' ', repeater, level);
   if (diff.status === 'tree') {
-    if (diff.name) {
-      result.push(`${indent.slice(0, -spec.length)}${spec}${diff.name}: {`);
-    } else {
-      result.push('{');
-    }
-    diff.children.forEach((child) => result.push(formatter(child, level + 1)));
-    if (diff.name) {
-      result.push(`${indent}}`);
-    } else {
-      result.push('}');
-    }
-  } else if (diff.status === 'updated') {
+    const startLine = diff.name ? `${makeLine(indent, diff.status, diff.name)}: {\n` : '{\n';
+    const endLine = diff.name ? `${indent}}\n` : '}';
+    const childs = diff.children.reduce((acc, child) => `${acc}${formatter(child, level + 1)}`, '');
+    return `${startLine}${childs}${endLine}`;
+  } if (diff.status === 'updated') {
     const valueA = convertValue(diff.values.old, level + 1);
     const valueB = convertValue(diff.values.new, level + 1);
-
-    result.push(`${indent.slice(0, -removed.length)}${removed}${diff.name}: ${valueA}`);
-    result.push(`${indent.slice(0, -added.length)}${added}${diff.name}: ${valueB}`);
-  } else {
-    const value = convertValue(diff.values.default, level + 1);
-    result.push(`${indent.slice(0, -spec.length)}${spec}${diff.name}: ${value}`);
+    const lineA = `${makeLine(indent, 'removed', diff.name)}: ${valueA}\n`;
+    const lineB = `${makeLine(indent, 'added', diff.name)}: ${valueB}\n`;
+    return `${lineA}${lineB}`;
   }
-
-  return result.join('\n');
+  const value = convertValue(diff.values.default, level + 1);
+  return `${makeLine(indent, diff.status, diff.name)}: ${value}\n`;
 };
 
 export default (diff, level) => formatter(diff, level);

@@ -12,7 +12,7 @@ const stringify = (value) => {
 const formatter = (diff, name = '') => {
   const result = diff.children.reduce((acc, child) => {
     const fullName = [name, child.name]
-      .filter((item) => item !== '')
+      .filter((item) => item)
       .join('.');
 
     if (child.status === 'tree') {
@@ -34,4 +34,4 @@ const formatter = (diff, name = '') => {
   return result;
 };
 
-export default (diff) => formatter(diff);
+export default (diff, name) => formatter(diff, name);
