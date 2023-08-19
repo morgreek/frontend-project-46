@@ -1,45 +1,37 @@
 import _ from 'lodash';
 
 const stringify = (value) => {
-  let result;
   if (typeof value === 'string') {
-    result = `'${value}'`;
-  } else if (_.isPlainObject(value)) {
-    result = '[complex value]';
-  } else {
-    result = value;
+    return `'${value}'`;
+  } if (_.isPlainObject(value)) {
+    return '[complex value]';
   }
+  return value;
+};
+
+const formatter = (diff, name = '') => {
+  const result = diff.children.reduce((acc, child) => {
+    const fullName = [name, child.name]
+      .filter((item) => item !== '')
+      .join('.');
+
+    if (child.status === 'tree') {
+      return `${acc}${formatter(child, fullName)}\n`;
+    } if (child.status === 'updated') {
+      const oldValue = stringify(child.values.old);
+      const newValue = stringify(child.values.new);
+      return `${acc}Property '${fullName}' was updated. From ${oldValue} to ${newValue}\n`;
+    } if (child.status === 'removed') {
+      return `${acc}Property '${fullName}' was removed\n`;
+    } if (child.status === 'added') {
+      const value = stringify(child.values.default);
+      return `${acc}Property '${fullName}' was added with value: ${value}\n`;
+    }
+    return acc;
+  }, '')
+    .trim();
 
   return result;
 };
 
-const formatter = (diff, parent, acc) => {
-  const result = acc ?? [];
-  let path = [];
-  if (parent) {
-    path.push(parent);
-  }
-  if (_.has(diff, 'name')) {
-    path.push(diff.name);
-  }
-  path = path.join('.');
-
-  if (diff.status === 'tree') {
-    diff.children.forEach((child) => {
-      formatter(child, path, result);
-    });
-  } else if (diff.status === 'updated') {
-    const oldValue = stringify(diff.values.old);
-    const newValue = stringify(diff.values.new);
-    result.push(`Property '${path}' was updated. From ${oldValue} to ${newValue}`);
-  } else if (diff.status === 'removed') {
-    result.push(`Property '${path}' was removed`);
-  } else if (diff.status === 'added') {
-    const value = stringify(diff.values.default);
-    result.push(`Property '${path}' was added with value: ${value}`);
-  }
-
-  return result.join('\n');
-};
-
-export default (diff, parent) => formatter(diff, parent);
+export default (diff) => formatter(diff);

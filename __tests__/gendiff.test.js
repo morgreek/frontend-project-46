@@ -18,7 +18,6 @@ const fileResult = fs.readFileSync(getFixturePath('fileResult.txt'), 'utf-8');
 const fileResultPlain = fs.readFileSync(getFixturePath('fileResultPlain.txt'), 'utf-8');
 const fileResultJson = fs.readFileSync(getFixturePath('fileResultJson.txt'), 'utf-8');
 
-
 test('common case', () => {
   // JSON
   expect(gendif(file1Path, file2Path, 'stylish')).toEqual(fileResult);
