@@ -8,25 +8,16 @@ const __dirname = path.dirname(__filename);
 
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
 
-let file1Path;
-let file2Path;
-let yFile1Path;
-let yFile2Path;
-let fileResult;
-let fileResultPlain;
-let fileResultJson;
+const file1Path = getFixturePath('file1.json');
+const file2Path = getFixturePath('file2.json');
 
-beforeEach(() => {
-  file1Path = getFixturePath('file1.json');
-  file2Path = getFixturePath('file2.json');
+const yFile1Path = getFixturePath('file1.yml');
+const yFile2Path = getFixturePath('file2.yaml');
 
-  yFile1Path = getFixturePath('file1.yml');
-  yFile2Path = getFixturePath('file2.yaml');
+const fileResult = fs.readFileSync(getFixturePath('fileResult.txt'), 'utf-8');
+const fileResultPlain = fs.readFileSync(getFixturePath('fileResultPlain.txt'), 'utf-8');
+const fileResultJson = fs.readFileSync(getFixturePath('fileResultJson.txt'), 'utf-8');
 
-  fileResult = fs.readFileSync(getFixturePath('fileResult.txt'), 'utf-8');
-  fileResultPlain = fs.readFileSync(getFixturePath('fileResultPlain.txt'), 'utf-8');
-  fileResultJson = fs.readFileSync(getFixturePath('fileResultJson.txt'), 'utf-8');
-});
 
 test('common case', () => {
   // JSON
