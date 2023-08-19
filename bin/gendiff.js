@@ -15,7 +15,6 @@ program
   .addOption(formatOption)
   .action((pathA, pathB) => {
     const result = compareStrings(pathA, pathB, program.opts().format);
-    console.log(result);
     return result;
   });
 
