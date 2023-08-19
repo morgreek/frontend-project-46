@@ -9,23 +9,28 @@ const stringify = (value) => {
   return value;
 };
 
+const getKeysChain = (parentName, childName) => [parentName, childName]
+  .filter((item) => item)
+  .join('.');
+
 const formatter = (diff, name = '') => {
   const result = diff.children.reduce((acc, child) => {
-    const fullName = [name, child.name]
-      .filter((item) => item)
-      .join('.');
+    const paths = getKeysChain(name, child.name);
 
     if (child.status === 'tree') {
-      return `${acc}${formatter(child, fullName)}\n`;
-    } if (child.status === 'updated') {
+      return `${acc}${formatter(child, paths)}\n`;
+    }
+    if (child.status === 'updated') {
       const oldValue = stringify(child.values.old);
       const newValue = stringify(child.values.new);
-      return `${acc}Property '${fullName}' was updated. From ${oldValue} to ${newValue}\n`;
-    } if (child.status === 'removed') {
-      return `${acc}Property '${fullName}' was removed\n`;
-    } if (child.status === 'added') {
+      return `${acc}Property '${paths}' was updated. From ${oldValue} to ${newValue}\n`;
+    }
+    if (child.status === 'removed') {
+      return `${acc}Property '${paths}' was removed\n`;
+    }
+    if (child.status === 'added') {
       const value = stringify(child.values.default);
-      return `${acc}Property '${fullName}' was added with value: ${value}\n`;
+      return `${acc}Property '${paths}' was added with value: ${value}\n`;
     }
     return acc;
   }, '')
