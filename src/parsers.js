@@ -5,16 +5,15 @@ const jsonParser = (content) => JSON.parse(content);
 const yamlParser = (content) => yaml.load(content);
 
 export default (content, format) => {
-  const jsonExt = ['json'];
-  const yamlExt = ['yaml', 'yml'];
+  switch (format) {
+    case 'json':
+      return jsonParser(content);
 
-  if (jsonExt.includes(format)) {
-    return jsonParser(content);
+    case 'yml':
+    case 'yaml':
+      return yamlParser(content);
+
+    default:
+      throw new Error(`Parser not found for this format: ${format}`);
   }
-
-  if (yamlExt.includes(format)) {
-    return yamlParser(content);
-  }
-
-  throw new Error(`Parser not found for this format: ${format}`);
 };

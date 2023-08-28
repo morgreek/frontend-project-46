@@ -17,22 +17,34 @@ const formatter = (diff, name = '') => {
   const result = diff.children.reduce((acc, child) => {
     const paths = getKeysChain(name, child.name);
 
-    if (child.status === 'tree') {
-      return `${acc}${formatter(child, paths)}\n`;
+    switch (child.status) {
+      case 'tree': {
+        return `${acc}${formatter(child, paths)}\n`;
+      }
+
+      case 'updated': {
+        const oldValue = stringify(child.values.old);
+        const newValue = stringify(child.values.new);
+        return `${acc}Property '${paths}' was updated. From ${oldValue} to ${newValue}\n`;
+      }
+
+      case 'removed': {
+        return `${acc}Property '${paths}' was removed\n`;
+      }
+
+      case 'added': {
+        const value = stringify(child.values.default);
+        return `${acc}Property '${paths}' was added with value: ${value}\n`;
+      }
+
+      case 'default': {
+        return acc;
+      }
+
+      default: {
+        throw new Error(`Plain formatter - unknow child status: ${child.status}`);
+      }
     }
-    if (child.status === 'updated') {
-      const oldValue = stringify(child.values.old);
-      const newValue = stringify(child.values.new);
-      return `${acc}Property '${paths}' was updated. From ${oldValue} to ${newValue}\n`;
-    }
-    if (child.status === 'removed') {
-      return `${acc}Property '${paths}' was removed\n`;
-    }
-    if (child.status === 'added') {
-      const value = stringify(child.values.default);
-      return `${acc}Property '${paths}' was added with value: ${value}\n`;
-    }
-    return acc;
   }, '')
     .trim();
 

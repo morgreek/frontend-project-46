@@ -5,6 +5,10 @@ const repeater = 4;
 const indentator = (char, repeat, level = 0) => char.repeat(level * repeat);
 
 const stringify = (object, level, name) => {
+  if (!_.isPlainObject(object)) {
+    return object;
+  }
+
   const indent = indentator(' ', repeater, level);
   const startLine = name ? `${indent.slice(0, repeater * (-1))}${name}: {\n` : '{\n';
 
@@ -21,28 +25,16 @@ const stringify = (object, level, name) => {
   return result;
 };
 
-const convertValue = (value, level) => {
-  if (_.isPlainObject(value)) {
-    return stringify(value, level);
-  }
-  return value;
-};
-
 const getSpecSymbols = (status) => {
-  const added = '+ ';
-  const removed = '- ';
-  const noChanges = '  ';
-
-  switch (status) {
-    case 'added':
-      return added;
-
-    case 'removed':
-      return removed;
-
-    default:
-      return noChanges;
+  const statuses = new Map([
+    ['added', '+ '],
+    ['removed', '- '],
+    ['noChanges', '  '],
+  ]);
+  if (statuses.has(status)) {
+    return statuses.get(status);
   }
+  return statuses.get('noChanges');
 };
 
 const makeLine = (indent, status, name) => {
@@ -52,20 +44,32 @@ const makeLine = (indent, status, name) => {
 
 const formatter = (diff, level = 0) => {
   const indent = indentator(' ', repeater, level);
-  if (diff.status === 'tree') {
-    const startLine = diff.name ? `${makeLine(indent, diff.status, diff.name)}: {\n` : '{\n';
-    const endLine = diff.name ? `${indent}}\n` : '}';
-    const childs = diff.children.reduce((acc, child) => `${acc}${formatter(child, level + 1)}`, '');
-    return `${startLine}${childs}${endLine}`;
-  } if (diff.status === 'updated') {
-    const valueA = convertValue(diff.values.old, level + 1);
-    const valueB = convertValue(diff.values.new, level + 1);
-    const lineA = `${makeLine(indent, 'removed', diff.name)}: ${valueA}\n`;
-    const lineB = `${makeLine(indent, 'added', diff.name)}: ${valueB}\n`;
-    return `${lineA}${lineB}`;
+  switch (diff.status) {
+    case 'tree': {
+      const startLine = diff.name ? `${makeLine(indent, diff.status, diff.name)}: {\n` : '{\n';
+      const endLine = diff.name ? `${indent}}\n` : '}';
+      const childs = diff.children.reduce((acc, child) => `${acc}${formatter(child, level + 1)}`, '');
+      return `${startLine}${childs}${endLine}`;
+    }
+
+    case 'updated': {
+      const valueA = stringify(diff.values.old, level + 1);
+      const valueB = stringify(diff.values.new, level + 1);
+      const lineA = `${makeLine(indent, 'removed', diff.name)}: ${valueA}\n`;
+      const lineB = `${makeLine(indent, 'added', diff.name)}: ${valueB}\n`;
+      return `${lineA}${lineB}`;
+    }
+    case 'added':
+    case 'removed':
+    case 'default': {
+      const value = stringify(diff.values.default, level + 1);
+      return `${makeLine(indent, diff.status, diff.name)}: ${value}\n`;
+    }
+
+    default: {
+      throw new Error(`Stylish formatter - unknow diff status: ${diff.status}`);
+    }
   }
-  const value = convertValue(diff.values.default, level + 1);
-  return `${makeLine(indent, diff.status, diff.name)}: ${value}\n`;
 };
 
 export default (diff, level) => formatter(diff, level);
