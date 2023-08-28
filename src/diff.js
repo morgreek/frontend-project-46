@@ -14,7 +14,7 @@ const getDistinctKeys = (objA, objB) => {
   return _.sortBy([...new Set([...keysA, ...keysB])]);
 };
 
-export const genDiff = (objA, objB, name) => {
+const genDiff = (objA, objB, name) => {
   const keys = getDistinctKeys(objA, objB);
   const children = keys
     .reduce((acc, key) => {
@@ -47,3 +47,5 @@ export const genDiff = (objA, objB, name) => {
 
   return genNode({ name, status: 'tree', children });
 };
+
+export default genDiff;

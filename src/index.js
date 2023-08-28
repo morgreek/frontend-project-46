@@ -3,7 +3,7 @@ import path from 'path';
 import proc from 'process';
 import parser from './parsers.js';
 import formatter from './formatters/index.js';
-import { genDiff } from './diff.js';
+import gendiff from './diff.js';
 
 const readFile = (filepath) => {
   const currentDir = proc.cwd();
@@ -24,7 +24,7 @@ export default (pathA, pathB, type = 'stylish') => {
   const objA = parser(contentA, extA);
   const objB = parser(contentB, extB);
 
-  const difference = genDiff(objA, objB);
+  const difference = gendiff(objA, objB);
 
   const style = formatter(difference, type);
 
