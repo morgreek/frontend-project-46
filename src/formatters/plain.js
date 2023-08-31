@@ -33,11 +33,11 @@ const formatter = (diff, name = '') => {
       }
 
       case 'added': {
-        const value = stringify(child.values.default);
+        const value = stringify(child.values.value);
         return `${acc}Property '${paths}' was added with value: ${value}\n`;
       }
 
-      case 'default': {
+      case 'same': {
         return acc;
       }
 
@@ -51,4 +51,4 @@ const formatter = (diff, name = '') => {
   return result;
 };
 
-export default (diff, name) => formatter(diff, name);
+export default formatter;

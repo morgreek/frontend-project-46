@@ -1,13 +1,5 @@
 import _ from 'lodash';
 
-const genNode = (parameters) => ({
-  name: null,
-  status: 'tree',
-  values: {},
-  children: [],
-  ...parameters,
-});
-
 const getDistinctKeys = (objA, objB) => {
   const keysA = _.keys(objA);
   const keysB = _.keys(objB);
@@ -24,28 +16,30 @@ const genDiff = (objA, objB, name) => {
       const isObjectA = _.isPlainObject(valueA);
       const isObjectB = _.isPlainObject(valueB);
 
-      switch (true) {
-        case isObjectA && isObjectB:
-          return [...acc, genDiff(valueA, valueB, key)];
-
-        case valueA !== undefined && valueB === undefined:
-          return [...acc, genNode({ name: key, status: 'removed', values: { default: valueA } })];
-
-        case valueA === undefined && valueB !== undefined:
-          return [...acc, genNode({ name: key, status: 'added', values: { default: valueB } })];
-
-        case valueA !== valueB:
-          return [...acc, genNode({ name: key, status: 'updated', values: { old: valueA, new: valueB } })];
-
-        case _.isEqual(valueA, valueB):
-          return [...acc, genNode({ name: key, status: 'default', values: { default: valueA } })];
-
-        default:
-          throw new Error(`Error at switch comparsion statements - key: ${key} | valueA: ${valueA} | valueB: ${valueB}`);
+      if (isObjectA && isObjectB) {
+        return [...acc, genDiff(valueA, valueB, key)];
       }
+
+      if (valueA !== undefined && valueB === undefined) {
+        return [...acc, { name: key, status: 'removed', values: { value: valueA } }];
+      }
+
+      if (valueA === undefined && valueB !== undefined){
+        return [...acc, { name: key, status: 'added', values: { value: valueB } }];
+      }
+
+      if (valueA !== valueB){
+        return [...acc, { name: key, status: 'updated', values: { old: valueA, new: valueB } }];
+      }
+
+      if (_.isEqual(valueA, valueB)){
+        return [...acc, { name: key, status: 'same', values: { value: valueA } }];
+      }
+
+      throw new Error(`Error at switch comparsion statements - key: ${key} | valueA: ${valueA} | valueB: ${valueB}`);
     }, []);
 
-  return genNode({ name, status: 'tree', children });
+  return { name, status: 'tree', children };
 };
 
 export default genDiff;

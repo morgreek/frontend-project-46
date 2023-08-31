@@ -28,6 +28,5 @@ export default (pathA, pathB, type = 'stylish') => {
 
   const style = formatter(difference, type);
 
-  console.log(style);
   return style;
 };

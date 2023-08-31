@@ -48,8 +48,8 @@ const formatter = (diff, level = 0) => {
     case 'tree': {
       const startLine = diff.name ? `${makeLine(indent, diff.status, diff.name)}: {\n` : '{\n';
       const endLine = diff.name ? `${indent}}\n` : '}';
-      const childs = diff.children.reduce((acc, child) => `${acc}${formatter(child, level + 1)}`, '');
-      return `${startLine}${childs}${endLine}`;
+      const childrens = diff.children.reduce((acc, child) => `${acc}${formatter(child, level + 1)}`, '');
+      return `${startLine}${childrens}${endLine}`;
     }
 
     case 'updated': {
@@ -61,8 +61,8 @@ const formatter = (diff, level = 0) => {
     }
     case 'added':
     case 'removed':
-    case 'default': {
-      const value = stringify(diff.values.default, level + 1);
+    case 'same': {
+      const value = stringify(diff.values.value, level + 1);
       return `${makeLine(indent, diff.status, diff.name)}: ${value}\n`;
     }
 
@@ -72,4 +72,4 @@ const formatter = (diff, level = 0) => {
   }
 };
 
-export default (diff, level) => formatter(diff, level);
+export default formatter;
