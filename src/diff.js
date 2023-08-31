@@ -24,15 +24,15 @@ const genDiff = (objA, objB, name) => {
         return [...acc, { name: key, status: 'removed', values: { value: valueA } }];
       }
 
-      if (valueA === undefined && valueB !== undefined){
+      if (valueA === undefined && valueB !== undefined) {
         return [...acc, { name: key, status: 'added', values: { value: valueB } }];
       }
 
-      if (valueA !== valueB){
+      if (valueA !== valueB) {
         return [...acc, { name: key, status: 'updated', values: { old: valueA, new: valueB } }];
       }
 
-      if (_.isEqual(valueA, valueB)){
+      if (_.isEqual(valueA, valueB)) {
         return [...acc, { name: key, status: 'same', values: { value: valueA } }];
       }
 
